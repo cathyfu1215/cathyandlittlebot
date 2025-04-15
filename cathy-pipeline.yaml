@@ -1,0 +1,85 @@
+name: Cathy’s CI/CD Pipeline (Care Integration / Continuous Development)
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # Runs every day at 9 AM
+  workflow_dispatch:     # You can also trigger manually
+
+jobs:
+  check_in:
+    name: Morning Check-In
+    runs-on: human-mac-m3
+
+    steps:
+      - name: Mood Check
+        run: |
+          echo "How do you feel today?"
+          read -p "Mood (1-10): " mood
+          if [ "$mood" -lt 5 ]; then
+            echo "⚠️ Mood is low. Initiating self-care protocol."
+            exit 78  # graceful exit
+          else
+            echo "✅ Mood is good. Proceeding."
+          fi
+
+      - name: Hydration Check
+        run: |
+          echo "Have you had water today? 💧"
+          read -p "(y/n): " hydrated
+          if [ "$hydrated" != "y" ]; then
+            echo "🚰 Please drink a glass of water now."
+            read -p "Press enter after hydrating..." dummy
+          else
+            echo "🟢 Hydration status: good."
+          fi
+
+      - name: Brain Status Scan
+        run: |
+          echo "Quick brain scan... 🧠"
+          echo "Did you get enough sleep?"
+          read -p "(y/n): " sleep
+          if [ "$sleep" != "y" ]; then
+            echo "😴 You need more rest. Try power napping or rescheduling deep work."
+            exit 78
+          fi
+
+  focus_tasks:
+    name: Deploy Daily Goals
+    needs: check_in
+    if: ${{ success() }}
+    runs-on: human-mac-m3
+
+    steps:
+      - name: Select Primary Task
+        run: |
+          echo "🧩 Choose your focus:"
+          echo "1. Build a project"
+          echo "2. Apply for jobs"
+          echo "3. Learn something cool"
+          read -p "Enter choice (1/2/3): " choice
+          echo "🎯 You chose task $choice. Focus mode: ON."
+
+      - name: Set Timer
+        run: |
+          echo "⏱️ Starting a 25-min Pomodoro. See you after a break!"
+          sleep 1500  # 25 minutes
+          echo "🔔 Break time!"
+
+  self_healing:
+    name: Graceful Failure Recovery
+    runs-on: human-mac-m3
+    if: ${{ failure() }}
+
+    steps:
+      - name: Diagnose & Reboot
+        run: |
+          echo "😓 System not ready. Time to take care of yourself."
+          echo "Suggestions:"
+          echo "- Go for a walk"
+          echo "- Journal your thoughts"
+          echo "- Talk to a friend"
+          echo "- Take a nap"
+          echo "- Eat something nourishing 🥗"
+          read -p "What will you try? " action
+          echo "💡 Good choice! Come back when you're ready."
+
